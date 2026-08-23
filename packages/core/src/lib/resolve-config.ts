@@ -45,8 +45,30 @@ import type { Plugin } from "../types/plugin";
  */
 export function uniquePlugins(plugins: Plugin[]): Plugin[] {
   const seen = new Set<string>();
+  const visiting = new Set<Plugin>();
 
-  return plugins.filter(plugin => {
+  const flatten = (items: Plugin[]): Plugin[] => {
+    const flattened: Plugin[] = [];
+
+    for (const plugin of items) {
+      if (!plugin || visiting.has(plugin)) {
+        continue;
+      }
+
+      visiting.add(plugin);
+      if (plugin.plugins) {
+        flattened.push(...flatten(plugin.plugins));
+      }
+      if (plugin.extract || plugin.generate || plugin.validate) {
+        flattened.push(plugin);
+      }
+      visiting.delete(plugin);
+    }
+
+    return flattened;
+  };
+
+  return flatten(plugins).filter(plugin => {
     if (!plugin?.name) {
       return true;
     }

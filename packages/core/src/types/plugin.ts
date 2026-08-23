@@ -68,6 +68,14 @@ export interface Plugin {
   name: string;
 
   /**
+   * Plugins contributed by this plugin.
+   *
+   * Composite plugins use this to assemble existing Razorwind plugins without
+   * changing how their extraction or generation hooks are scheduled.
+   */
+  plugins?: Plugin[];
+
+  /**
    * Custom file parsers registered with Style Dictionary to load token sources.
    *
    * @see https://styledictionary.com/reference/hooks/parsers/

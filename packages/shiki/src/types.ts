@@ -73,15 +73,13 @@ export interface ShikiTheme {
   /** Background color (Shiki custom field). */
   bg?: string;
   /**
-   * VS Code-style workbench / ANSI color map.
-   * Used by Shiki for defaults and `lang: "ansi"`.
+   * VS Code-style workbench / ANSI color map. Used by Shiki for defaults and `lang: "ansi"`.
    */
   colors?: Record<string, string>;
   /** Token scope rules (TextMate `settings`). Preferred over {@link tokenColors}. */
   settings?: ShikiThemeSetting[];
   /**
-   * Same as {@link settings} — Shiki uses this as fallback when `settings`
-   * is absent (VS Code theme JSON shape).
+   * Same as {@link settings} — Shiki uses this as fallback when `settings` is absent (VS Code theme JSON shape).
    */
   tokenColors?: ShikiThemeSetting[];
   /** Hex-key color remaps (Shiki custom field). */

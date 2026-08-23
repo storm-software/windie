@@ -26,29 +26,29 @@ catalog:
   "@shell-shock/preset-cli": ^0.9.36
   "@shell-shock/core": ^0.17.24
   "@shell-shock/nx": ^0.0.97
-  "@storm-software/config": ^1.138.69
-  "@storm-software/config-tools": ^1.190.133
-  "@storm-software/cspell": ^0.46.200
-  "@storm-software/eslint-plugin-pnpm": ^0.0.96
-  "@storm-software/eslint-config-react": ^0.0.90
-  "@storm-software/eslint-plugin-tsdoc": ^0.0.96
-  "@storm-software/git-tools": ^2.131.141
-  "@storm-software/linting-tools": ^1.134.63
-  "@storm-software/markdownlint": ^0.30.288
-  "@storm-software/pnpm-tools": ^0.7.147
-  "@storm-software/prettier": ^0.59.186
-  "@storm-software/tsconfig": ^0.48.199
-  "@storm-software/untyped": ^0.24.275
-  "@storm-software/workspace-tools": ^1.297.2
-  "@stryke/env": ^0.20.130
-  "@stryke/fs": ^0.33.113
-  "@stryke/hash": ^0.13.66
-  "@stryke/helpers": ^0.10.51
-  "@stryke/path": ^0.29.38
-  "@stryke/string-format": ^0.17.53
-  "@stryke/type-checks": ^0.6.44
-  "@stryke/types": ^0.12.39
-  "@stryke/url": ^0.4.63
+  "@storm-software/config": ^1.138.70
+  "@storm-software/config-tools": ^1.190.134
+  "@storm-software/cspell": ^0.46.201
+  "@storm-software/eslint-plugin-pnpm": ^0.0.97
+  "@storm-software/eslint-config-react": ^0.0.91
+  "@storm-software/eslint-plugin-tsdoc": ^0.0.97
+  "@storm-software/git-tools": ^2.131.142
+  "@storm-software/linting-tools": ^1.134.64
+  "@storm-software/markdownlint": ^0.30.289
+  "@storm-software/pnpm-tools": ^0.7.148
+  "@storm-software/prettier": ^0.59.187
+  "@storm-software/tsconfig": ^0.48.200
+  "@storm-software/untyped": ^0.24.276
+  "@storm-software/workspace-tools": ^1.297.3
+  "@stryke/env": ^0.20.131
+  "@stryke/fs": ^0.33.114
+  "@stryke/hash": ^0.13.67
+  "@stryke/helpers": ^0.10.52
+  "@stryke/path": ^0.29.39
+  "@stryke/string-format": ^0.17.54
+  "@stryke/type-checks": ^0.6.45
+  "@stryke/types": ^0.12.40
+  "@stryke/url": ^0.4.64
   "@tailwindcss/node": ^4.3.3
   "@types/node": ^25.9.5
   "@typescript/native-preview": 7.0.0-dev.20251218.3
@@ -56,7 +56,7 @@ catalog:
   chalk: ^5.6.2
   copyfiles: ^2.4.1
   defu: ^6.1.7
-  eslint: ^10.8.1
+  eslint: ^10.9.0
   eslint-flat-config-utils: ^3.2.0
   fast-glob: ^3.3.3
   jiti: ^2.7.0
@@ -68,7 +68,7 @@ catalog:
   pkg-types: ^2.3.1
   prettier: ^3.9.6
   rimraf: ^6.1.3
-  shadcn: ^4.18.0
+  shadcn: ^4.19.0
   smol-toml: ^1.8.0
   style-dictionary: ^5.5.2
   tailwindcss: ^4.3.3
@@ -81,7 +81,7 @@ catalog:
   zod: ^4.4.3
   zx: ^8.8.5
   powerlines: ^0.47.211
-  "@storm-software/tsdoc": ^0.13.285
+  "@storm-software/tsdoc": ^0.13.286
 overrides:
   "@emnapi/core": 1.11.2
   "@emnapi/runtime": 1.11.2

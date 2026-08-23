@@ -1,0 +1,38 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "tsBuildInfoFile": "out-tsc/tsconfig.tsbuildinfo",
+    "rootDir": ".",
+    "outDir": "./out-tsc"
+  },
+  "references": [
+    { "path": "../chrome/tsconfig.lib.json" },
+    { "path": "../core/tsconfig.lib.json" },
+    { "path": "../cursor/tsconfig.lib.json" },
+    { "path": "../ghostty/tsconfig.lib.json" },
+    { "path": "../notepad-plus-plus/tsconfig.lib.json" },
+    { "path": "../sandpack/tsconfig.lib.json" },
+    { "path": "../shiki/tsconfig.lib.json" },
+    { "path": "../storybook/tsconfig.lib.json" },
+    { "path": "../thunderbird/tsconfig.lib.json" },
+    { "path": "../vivaldi/tsconfig.lib.json" },
+    { "path": "../vsce/tsconfig.lib.json" },
+    { "path": "../zed/tsconfig.lib.json" },
+    { "path": "../zsh/tsconfig.lib.json" }
+  ],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.js",
+    "src/**/*.mjs",
+    "src/**/*.cjs",
+    "src/**/*.tsx",
+    "src/**/*.jsx",
+    "src/**/*.mts",
+    "src/**/*.cts",
+    "types/*.d.ts",
+    "package.json",
+    "powerlines.config.ts",
+    "powerlines.d.ts"
+  ],
+  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
+}
