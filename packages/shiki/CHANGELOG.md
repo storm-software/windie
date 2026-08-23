@@ -2,6 +2,16 @@
 
 # Changelog for Razorwind - Shiki
 
+## [0.0.35](https://github.com/storm-software/razorwind/releases/tag/shiki%400.0.35) (08/23/2026)
+
+### Features
+
+- **preset:** Initial check-in of the preset plugin ([06cadb7](https://github.com/storm-software/razorwind/commit/06cadb7))
+
+### Updated Dependencies
+
+- Updated **core** to **v0.0.61**
+
 ## [0.0.34](https://github.com/storm-software/razorwind/releases/tag/shiki%400.0.34) (08/21/2026)
 
 ### Updated Dependencies

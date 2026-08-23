@@ -2,6 +2,12 @@
 
 # Changelog for Razorwind - Core
 
+## [0.0.61](https://github.com/storm-software/razorwind/releases/tag/core%400.0.61) (08/23/2026)
+
+### Features
+
+- **preset:** Initial check-in of the preset plugin ([06cadb7](https://github.com/storm-software/razorwind/commit/06cadb7))
+
 ## [0.0.60](https://github.com/storm-software/razorwind/releases/tag/core%400.0.60) (08/21/2026)
 
 ### Bug Fixes
