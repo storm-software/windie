@@ -2,6 +2,12 @@
 
 # Changelog for Razorwind - Core
 
+## [0.0.62](https://github.com/storm-software/razorwind/releases/tag/core%400.0.62) (08/24/2026)
+
+### Bug Fixes
+
+- **core:** Resolve issue invoking plugin processors ([3dcb9bf](https://github.com/storm-software/razorwind/commit/3dcb9bf))
+
 ## [0.0.61](https://github.com/storm-software/razorwind/releases/tag/core%400.0.61) (08/23/2026)
 
 ### Features
