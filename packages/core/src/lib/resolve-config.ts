@@ -59,7 +59,13 @@ export function uniquePlugins(plugins: Plugin[]): Plugin[] {
       if (plugin.plugins) {
         flattened.push(...flatten(plugin.plugins));
       }
-      if (plugin.extract || plugin.generate || plugin.validate) {
+      if (
+        plugin.parsers?.length ||
+        plugin.preprocessors?.length ||
+        plugin.extract ||
+        plugin.generate ||
+        plugin.validate
+      ) {
         flattened.push(plugin);
       }
       visiting.delete(plugin);

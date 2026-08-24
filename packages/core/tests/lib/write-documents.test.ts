@@ -26,11 +26,35 @@ import type { Plugin } from "../../src/types/plugin";
 
 describe("uniquePlugins", () => {
   it("keeps the first plugin for each name", () => {
-    const first: Plugin = { name: "css:generate" };
-    const duplicate: Plugin = { name: "css:generate" };
-    const other: Plugin = { name: "docgen:generate" };
+    const first: Plugin = { name: "css:generate", generate: () => ({}) };
+    const duplicate: Plugin = {
+      name: "css:generate",
+      generate: () => ({})
+    };
+    const other: Plugin = { name: "docgen:generate", generate: () => ({}) };
 
     expect(uniquePlugins([first, other, duplicate])).toEqual([first, other]);
+  });
+
+  it("keeps plugins that only contribute parser or preprocessor hooks", () => {
+    const parserOnly: Plugin = {
+      name: "parser-only",
+      parsers: [
+        {
+          pattern: /\.tokens$/,
+          parser: contents => JSON.parse(contents)
+        }
+      ]
+    };
+    const preprocessorOnly: Plugin = {
+      name: "preprocessor-only",
+      preprocessors: [dictionary => dictionary]
+    };
+
+    expect(uniquePlugins([parserOnly, preprocessorOnly])).toEqual([
+      parserOnly,
+      preprocessorOnly
+    ]);
   });
 });
 
