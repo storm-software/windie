@@ -86,31 +86,59 @@ export function renderColorPaletteBlock(
 ): string {
   const colors = tokens.filter(token => token.type === "color");
   const groupBy = options.colorGroupBy ?? 2;
-  const groups = groupByPath(colors, groupBy);
+  const renderItems = (sectionTokens: FlatToken[], indent = "    ") =>
+    [...groupByPath(sectionTokens, groupBy).entries()]
+      .toSorted(([a], [b]) => a.localeCompare(b))
+      .map(([group, groupTokens]) => {
+        const colorsObject = groupTokens
+          .map(token => {
+            const label = leafLabel(token.path, group);
 
-  const items = [...groups.entries()]
-    .toSorted(([a], [b]) => a.localeCompare(b))
-    .map(([group, groupTokens]) => {
-      const colorsObject = groupTokens
-        .map(token => {
-          const label = leafLabel(token.path, group);
+            return `${indent}  ${toLiteral(label)}: ${toLiteral(token.cssValue)}`;
+          })
+          .join(",\n");
 
-          return `      ${toLiteral(label)}: ${toLiteral(token.cssValue)}`;
-        })
-        .join(",\n");
+        const subtitle =
+          groupTokens.find(token => token.description)?.description ??
+          `${groupTokens.length} token${groupTokens.length === 1 ? "" : "s"}`;
 
-      const subtitle =
-        groupTokens.find(token => token.description)?.description ??
-        `${groupTokens.length} token${groupTokens.length === 1 ? "" : "s"}`;
-
-      return `    <ColorItem
+        return `${indent}<ColorItem
       title={${toLiteral(group)}}
       subtitle={${toLiteral(subtitle)}}
       colors={{
 ${colorsObject}
       }}
     />`;
-    })
+      })
+      .join("\n");
+
+  const paletteColors = colors.filter(token => token.palette);
+  const semanticColors = colors.filter(
+    token => !token.palette && token.childTheme
+  );
+  const otherColors = colors.filter(
+    token => !token.palette && !token.childTheme
+  );
+  const hasCategorizedColors =
+    paletteColors.length > 0 || semanticColors.length > 0;
+  const items = renderItems(colors);
+  const sections = [
+    ["Color palettes", paletteColors],
+    ["Semantic colors", semanticColors],
+    ["Colors", otherColors]
+  ]
+    .filter(
+      (section): section is [string, FlatToken[]] =>
+        !!section[1] && section[1].length > 0
+    )
+    .map(
+      ([title, sectionTokens]) => `      <section>
+        <h2>${title}</h2>
+        <ColorPalette>
+${renderItems(sectionTokens, "          ")}
+        </ColorPalette>
+      </section>`
+    )
     .join("\n");
 
   return `import { ColorPalette, ColorItem } from "@storybook/addon-docs/blocks";
@@ -122,9 +150,15 @@ ${colorsObject}
  */
 export function ColorPaletteBlock() {
   return (
-    <ColorPalette>
+${
+  hasCategorizedColors
+    ? `    <>
+${sections}
+    </>`
+    : `    <ColorPalette>
 ${items || "      {/* No color tokens */}"}
-    </ColorPalette>
+    </ColorPalette>`
+}
   );
 }
 `;

@@ -122,7 +122,7 @@
   "prettier.requireConfig": true,
   "prettier.bracketSameLine": true,
   "prettier.configPath": "./node_modules/@storm-software/prettier/recommended.mjs",
-  "prettier.ignorePath": "./node_modules/@storm-software/prettier/.prettierignore",
+  "prettier.ignorePath": "${workspaceFolder}/.vscode/prettierignore",
   "prettier.enableDebugLogs": false,
   "prettier.enable": true,
   "markdownlint.configFile": "~/repos/razorwind/node_modules/@storm-software/markdownlint/config/recommended.markdownlint-cli2.jsonc",

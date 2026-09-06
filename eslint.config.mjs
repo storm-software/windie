@@ -29,5 +29,6 @@ export default defineConfig({
   },
   tsdoc: {
     configFile: "@powerlines/tsdoc/recommended.json"
-  }
+  },
+  ignores: ["playground/complex-css/sample.css"]
 });

@@ -121,6 +121,33 @@ describe("flattenTokens", () => {
       "#0066cc"
     );
   });
+
+  it("preserves palette and semantic color metadata without clobbering token-set themes", () => {
+    const flat = flattenTokens({
+      dark: {
+        color: {
+          palette: {
+            palette: true,
+            1: { $type: "color", $value: "#111111" }
+          },
+          foreground: {
+            danger: {
+              $type: "color",
+              $value: "{color.palette.1}",
+              theme: "danger"
+            }
+          }
+        }
+      }
+    } as unknown as Schema["tokens"]);
+
+    expect(flat.find(token => token.path === "color.palette.1")).toEqual(
+      expect.objectContaining({ theme: "dark", palette: true })
+    );
+    expect(
+      flat.find(token => token.path === "color.foreground.danger")
+    ).toEqual(expect.objectContaining({ theme: "dark", childTheme: "danger" }));
+  });
 });
 
 describe("storybook plugin", () => {
@@ -172,6 +199,47 @@ describe("storybook plugin", () => {
     expect(documents["docs/tokens/Icons.mdx"]?.chunks?.[0]?.content).toContain(
       "<IconGalleryBlock />"
     );
+  });
+
+  it("separates palette, semantic, and unmarked colors into doc sections", () => {
+    const documents = generateTokenDocs(
+      {
+        ...spec,
+        tokens: {
+          color: {
+            yellow: {
+              palette: true,
+              1: { $type: "color", $value: "#ffee99" }
+            },
+            foreground: {
+              danger: {
+                $type: "color",
+                $value: "{color.yellow.1}",
+                theme: "danger"
+              }
+            },
+            black: { $type: "color", $value: "#000000" }
+          }
+        }
+      } as Schema,
+      { outputPath: "out" }
+    );
+
+    const colors =
+      documents["out/blocks/ColorPalette.tsx"]?.chunks?.[0]?.content;
+    expect(colors).toContain("<h2>Color palettes</h2>");
+    expect(colors).toContain("<h2>Semantic colors</h2>");
+    expect(colors).toContain("<h2>Colors</h2>");
+    expect(colors?.match(/<ColorPalette>/g)).toHaveLength(3);
+  });
+
+  it("keeps the single color palette block when no color metadata is present", () => {
+    const documents = generateTokenDocs(spec, { outputPath: "out" });
+    const colors =
+      documents["out/blocks/ColorPalette.tsx"]?.chunks?.[0]?.content;
+
+    expect(colors?.match(/<ColorPalette>/g)).toHaveLength(1);
+    expect(colors).not.toContain("<h2>");
   });
 
   it("generateTokenDocs mirrors the plugin generate output", () => {

@@ -28,7 +28,7 @@ import type {
 import { createDocument, resolveSchemaIdentity } from "@razorwind/core/utils";
 import { existsSync } from "@stryke/fs/exists";
 import { joinPaths } from "@stryke/path/join";
-import { dirname, join } from "node:path";
+import { dirname, isAbsolute, join, relative } from "node:path";
 import { renderInstallMd } from "./install";
 import type { ShadcnGeneratePluginOptions } from "./types";
 
@@ -116,8 +116,13 @@ function toRegistryFileType(
   return `registry:${type}`;
 }
 
+function toRegistryPath(path: string, cwd = process.cwd()): string {
+  return isAbsolute(path) ? relative(cwd, path) : path;
+}
+
 function mapFiles(
-  files: ComponentFile[] | undefined
+  files: ComponentFile[] | undefined,
+  cwd?: string
 ): RegistryFileLike[] | undefined {
   if (!files?.length) {
     return undefined;
@@ -126,7 +131,7 @@ function mapFiles(
   return files.map(file => {
     const type = toRegistryFileType(file.type!);
     const entry: RegistryFileLike = {
-      path: file.path,
+      path: toRegistryPath(file.path, cwd),
       type
     };
 
@@ -135,10 +140,10 @@ function mapFiles(
     }
 
     if (file.target) {
-      entry.target = file.target;
+      entry.target = toRegistryPath(file.target, cwd);
     } else if (type === "registry:file" || type === "registry:page") {
       // shadcn schema requires `target` for file/page entries
-      entry.target = file.path;
+      entry.target = toRegistryPath(file.path, cwd);
     }
 
     return entry;
@@ -149,7 +154,8 @@ function mapFiles(
  * Map a Razorwind {@link Component} into a shadcn registry item.
  */
 export function componentToRegistryItem(
-  component: Component
+  component: Component,
+  cwd?: string
 ): RegistryItemLike {
   const categories = component.tags?.length
     ? [...component.tags]
@@ -161,7 +167,7 @@ export function componentToRegistryItem(
   const registryDependencies = fromDependencyRecord(
     component.registryDependencies
   );
-  const files = mapFiles(component.files);
+  const files = mapFiles(component.files, cwd);
 
   return {
     name: component.name,
@@ -180,7 +186,8 @@ export function componentToRegistryItem(
  * Convert a `schema.components` record into a shadcn registry `items` list.
  */
 export function componentsToRegistryItems(
-  components: Components | undefined
+  components: Components | undefined,
+  cwd?: string
 ): RegistryItemLike[] {
   if (!components || Object.keys(components).length === 0) {
     return [];
@@ -188,7 +195,7 @@ export function componentsToRegistryItems(
 
   return Object.values(components)
     .filter((component): component is Component => Boolean(component?.name))
-    .map(componentToRegistryItem)
+    .map(component => componentToRegistryItem(component, cwd))
     .toSorted((a, b) => a.name.localeCompare(b.name));
 }
 
@@ -197,11 +204,12 @@ export function componentsToRegistryItems(
  */
 export function renderRegistryJson(
   components: Components | undefined,
-  options: Pick<ShadcnGeneratePluginOptions, "name" | "homepage"> = {}
+  options: Pick<ShadcnGeneratePluginOptions, "name" | "homepage"> = {},
+  cwd?: string
 ): RegistryDocument {
   const document: RegistryDocument = {
     $schema: REGISTRY_SCHEMA,
-    items: componentsToRegistryItems(components)
+    items: componentsToRegistryItems(components, cwd)
   };
 
   if (options.name) {
@@ -235,7 +243,8 @@ async function resolveoutputPath(
  */
 export async function generateRegistryJson(
   spec: Schema,
-  options: ShadcnGeneratePluginOptions = {}
+  options: ShadcnGeneratePluginOptions = {},
+  cwd?: string
 ): Promise<GeneratorFunctionResult<Schema, ShadcnGeneratePluginOptions>> {
   if (!spec.components || Object.keys(spec.components).length === 0) {
     return {};
@@ -251,7 +260,7 @@ export async function generateRegistryJson(
   };
 
   const outputPath = await resolveoutputPath(options);
-  const content = `${JSON.stringify(renderRegistryJson(spec.components, registryOptions), null, 2)}\n`;
+  const content = `${JSON.stringify(renderRegistryJson(spec.components, registryOptions, cwd), null, 2)}\n`;
   const installBody =
     options.installGuide ??
     renderInstallMd({
@@ -294,5 +303,6 @@ export async function generateRegistryJson(
 export default definePlugin((options?: ShadcnGeneratePluginOptions) => ({
   name: "shadcn:generate",
   themeGeneration: "combined",
-  generate: async spec => generateRegistryJson(spec, options ?? {})
+  generate: async (spec, config) =>
+    generateRegistryJson(spec, options ?? {}, config.cwd)
 }));

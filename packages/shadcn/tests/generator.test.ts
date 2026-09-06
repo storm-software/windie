@@ -234,6 +234,52 @@ describe("shadcn generate plugin", () => {
     expect(content).toContain(`"name": "button"`);
   });
 
+  it("writes absolute file paths and targets relative to the generation cwd", async () => {
+    const cwd = "/workspace/acme";
+    const documents = await generateRegistryJson(
+      {
+        ...spec,
+        components: {
+          button: {
+            ...components.button,
+            files: [
+              {
+                path: `${cwd}/registry/ui/button.tsx`,
+                target: `${cwd}/src/components/ui/button.tsx`,
+                type: "ui",
+                content: "export {}"
+              },
+              {
+                path: `${cwd}/registry/styles/button.css`,
+                type: "file",
+                content: ".button {}"
+              }
+            ]
+          }
+        }
+      },
+      { configFile: "registry.json" },
+      cwd
+    );
+    const content = documents["registry.json"]?.chunks?.[0]?.content;
+    const document = JSON.parse(content ?? "{}") as {
+      items: Array<{ files: Array<{ path: string; target?: string }> }>;
+    };
+
+    expect(document.items[0]?.files).toEqual([
+      {
+        path: "registry/ui/button.tsx",
+        target: "src/components/ui/button.tsx",
+        type: "registry:ui"
+      },
+      {
+        path: "registry/styles/button.css",
+        target: "registry/styles/button.css",
+        type: "registry:file"
+      }
+    ]);
+  });
+
   it("generateRegistryJson mirrors the plugin generate output", async () => {
     const documents = await generateRegistryJson(spec, {
       configFile: "registry.json",

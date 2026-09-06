@@ -17,16 +17,94 @@
  ------------------------------------------------------------------- */
 
 import type { Tokens } from "@razorwind/core/schema";
+import type { TokenSet } from "@razorwind/core/utils";
 import {
   flattenTokens as flattenTokensBase,
+  isObject,
+  isTokenLeaf,
   resolveTokenSets,
-  toCssVar,
-  type TokenSet
+  toCssVar
 } from "@razorwind/core/utils";
 import type { FlatToken, StorybookPluginOptions } from "./types";
 
-export type { TokenSet };
 export { resolveTokenSets };
+export type { TokenSet };
+
+function isTruthyFlag(value: unknown): boolean {
+  return value === true || value === "true" || value === 1;
+}
+
+function metadataKey(theme: string | undefined, path: string): string {
+  return theme ? `${theme}:${path}` : path;
+}
+
+function readChildTheme(node: Record<string, unknown>): string | undefined {
+  const value = node.theme ?? node.$theme;
+
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+function isColorMetadataKey(key: string, value: unknown): boolean {
+  if (key === "palette" || key === "$palette") {
+    return (
+      typeof value === "boolean" ||
+      typeof value === "number" ||
+      typeof value === "string"
+    );
+  }
+
+  return (key === "theme" || key === "$theme") && typeof value === "string";
+}
+
+function collectColorMetadata(
+  tokens: Tokens | Record<string, Tokens>
+): Map<string, Pick<FlatToken, "palette" | "childTheme">> {
+  const metadata = new Map<string, Pick<FlatToken, "palette" | "childTheme">>();
+
+  function walk(
+    node: unknown,
+    path: string[],
+    theme: string | undefined,
+    palette: boolean,
+    childTheme: string | undefined
+  ): void {
+    if (!isObject(node)) {
+      return;
+    }
+
+    const nextPalette =
+      palette || isTruthyFlag(node.palette) || isTruthyFlag(node.$palette);
+    const nextChildTheme = readChildTheme(node) ?? childTheme;
+
+    if (isTokenLeaf(node)) {
+      if (nextPalette || nextChildTheme) {
+        metadata.set(metadataKey(theme, path.join(".")), {
+          ...(nextPalette && { palette: true }),
+          ...(nextChildTheme && { childTheme: nextChildTheme })
+        });
+      }
+      return;
+    }
+
+    for (const [key, child] of Object.entries(node)) {
+      if (
+        (key.startsWith("$") && key !== "$palette" && key !== "$theme") ||
+        isColorMetadataKey(key, child)
+      ) {
+        continue;
+      }
+
+      walk(child, [...path, key], theme, nextPalette, nextChildTheme);
+    }
+  }
+
+  for (const set of resolveTokenSets(tokens)) {
+    const theme = set.id === "default" ? undefined : set.id;
+    walk(set.tokens, [], theme, false, undefined);
+  }
+
+  return metadata;
+}
 
 /**
  * Flatten DTCG token trees into documentation rows.
@@ -36,12 +114,18 @@ export function flattenTokens(
   options: Pick<StorybookPluginOptions, "cssVarPrefix" | "includeTypes"> = {}
 ): FlatToken[] {
   const cssVarPrefix = options.cssVarPrefix ?? "rw";
+  const metadata = collectColorMetadata(tokens);
 
   return flattenTokensBase<FlatToken>(tokens, {
     includeTypes: options.includeTypes,
-    enrichToken: base => ({
-      ...base,
-      cssVar: toCssVar(base.path, cssVarPrefix)
-    })
+    enrichToken: base => {
+      const colorMetadata = metadata.get(metadataKey(base.theme, base.path));
+
+      return {
+        ...base,
+        cssVar: toCssVar(base.path, cssVarPrefix),
+        ...(base.type === "color" && colorMetadata)
+      };
+    }
   });
 }

@@ -37,6 +37,10 @@ export interface FlatToken {
   description?: string;
   /** Theme / set id when tokens are a `Record<string, Tokens>`. */
   theme?: string;
+  /** True when this color belongs to an ancestor group marked `palette: true`. */
+  palette?: boolean;
+  /** Semantic child-theme name from a token or ancestor `theme` property. */
+  childTheme?: string;
 }
 
 /**
